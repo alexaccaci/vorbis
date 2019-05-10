@@ -25,20 +25,8 @@ Future<File> get _localFile async {
   return file;
 }
 
-void _decode(Uint8List data, File dst) {
-  Decoder decoder = Decoder();
-  decoder.decode(data, dst);
-}
-
 void main() {
   runApp(MyApp());
-  _localFile.then((file) {
-    _loadAsset().then((bytes) {
-      _decode(bytes, file);
-      print("Saved ${file.path}");
-      exit(0);
-    });
-  });
 }
 
 class MyApp extends StatelessWidget {
@@ -78,11 +66,23 @@ class MyHomePage extends StatefulWidget {
 
   final String title;
 
-  @override
+    @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  var _text = "Working...";
+
+  @override
+  void initState() {
+    _localFile.then((file) {
+      _loadAsset().then((bytes) {
+        Decoder().decode(bytes, file);
+        setState(() {_text = "Saved ${file.path}"; });
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -117,9 +117,7 @@ class _MyHomePageState extends State<MyHomePage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'Working...',
-            ),
+            Text(_text),
           ],
         ),
       ),
